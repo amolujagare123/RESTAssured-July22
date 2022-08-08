@@ -2,11 +2,13 @@ package MyTests;
 
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
+import io.restassured.builder.ResponseSpecBuilder;
 import io.restassured.config.RestAssuredConfig;
 import io.restassured.filter.Filter;
 import io.restassured.http.*;
 import io.restassured.mapper.ObjectMapper;
 import io.restassured.mapper.ObjectMapperType;
+import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import io.restassured.specification.*;
 
@@ -37,17 +39,32 @@ public class SamplePostRequestSpec {
                 .then().log().all().assertThat().statusCode(201);
 
         RequestSpecification reqPost = new RequestSpecBuilder()
-                .addHeader("Content-Type","application/json").build();
+                .setBaseUri("https://reqres.in")
+                .addHeader("Content-Type","application/json")
+                .build();
 
         RequestSpecification request = reqPost.body("{\n" +
                 "    \"name\": \"Tejas11\",\n" +
                 "    \"job\": \"Test leader11\"\n" +
                 "}");
 
+        Response res = request.when().post("/api/users");
+
+        ResponseSpecification response = new ResponseSpecBuilder().expectStatusCode(200).build();
+
+
+        String respString = res.then().log().all().spec(response).extract().asString();
+
+      //  ExtractableResponse<Response> resp = res.then().log().all().spec(response).extract();
+
+
+
+        /*
+
         given().log().all().spec(reqPost)
                 .when().post("/api/users")
                 .then().log().all().assertThat().statusCode(201);
-
+*/
         }
 
 }
